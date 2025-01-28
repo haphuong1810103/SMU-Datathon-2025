@@ -1,0 +1,203 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+body {
+    background-color: #f8f9fa;
+}
+
+.layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: 240px;
+    background-color: white;
+    padding: 20px 0;
+}
+
+.logo {
+    padding: 0 20px;
+    margin-bottom: 40px;
+}
+
+.logo img {
+    height: 40px;
+}
+
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-item {
+    padding: 12px 20px;
+    color: #666;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.nav-item.active {
+    color: #4747ff;
+    background-color: #f0f0ff;
+    border-left: 3px solid #4747ff;
+    font-weight: 500;
+}
+
+/* Main Content Styles */
+.main-content {
+    flex: 1;
+    padding: 20px;
+    background-color: #f8f9fa;
+}
+
+.content-grid {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 20px;
+}
+
+/* Chart Section Styles */
+.chart-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.chart-section h1 {
+    font-size: 20px;
+    color: #333;
+    font-weight: 500;
+}
+
+.chart-container {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.chart {
+    width: 100%;
+    height: 400;
+}
+
+/* Filter Section Styles */
+.filter-section {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    height: fit-content;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.filter-section h2 {
+    color: #ff4757;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.filter-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filter-group label {
+    font-size: 14px;
+    color: #666;
+}
+
+.filter-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.filter-range {
+    width: 100%;
+    accent-color: #4747ff;
+}
+
+/* Entity Table Styles */
+.entity-table {
+    margin-top: 20px;
+}
+
+.table-header, .table-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.table-header {
+    font-weight: 500;
+    color: #666;
+}
+
+.table-row {
+    color: #333;
+}
+
+/* Pagination Styles */
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+}
+
+.pages {
+    display: flex;
+    gap: 8px;
+}
+
+.pages a, .prev, .next {
+    padding: 6px 12px;
+    text-decoration: none;
+    color: #666;
+    border-radius: 4px;
+}
+
+.pages a.active {
+    background-color: #4747ff;
+    color: white;
+}
+
+.prev, .next {
+    color: #4747ff;
+}
+
+@media (max-width: 1024px) {
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .filter-section {
+        order: -1;
+    }
+}
+
+@media (max-width: 768px) {
+    .layout {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+    }
+}

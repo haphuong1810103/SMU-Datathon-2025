@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entity Analysis Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}" defer></script>
+</head>
+<body>
+    <div class="layout">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="ISD Logo">
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active">Entity Analysis</a>
+                <a href="#" class="nav-item">Entity Relationship</a>
+                <a href="#" class="nav-item">Knowledge Graph</a>
+                <a href="#" class="nav-item">Chatbot</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Content Grid -->
+            <div class="content-grid">
+                <!-- Main Chart Section -->
+                <div class="chart-section">
+                    
+                    <h1>Top Entities</h1>
+                    <div class="chart-container">
+                        <div id="topEntities" class="chart"></div>
+                    </div>
+
+                    <h1>Entity Mention Overtime</h1>
+                    <div class="chart-container">
+                        <div id="mentionsTime" class="chart"></div>
+                    </div>
+
+
+                    <h1>Entity Types Distribution</h1>
+                    <div class="chart-container">
+                        <div id="entityDist" class="chart"></div>
+                        <div class="entity-table">
+                            <div class="table-header">
+                                <span>Entity</span>
+                                <span>Type</span>
+                                <span>Mentions</span>
+                            </div>
+                            {% for entity in entity_list %}
+                            <div class="table-row">
+                                <span>{{ entity.Entity }}</span>
+                                <span>{{ entity.Type }}</span>
+                                <span>{{ entity.Mentions }}</span>
+                            </div>
+                            {% endfor %}
+                            <div class="pagination">
+                                <a href="#" class="prev" onclick="handlePagination('prev')">Previous</a>
+                                <div class="pages">
+                                    <a href="#" class="active">1</a>
+                                    <a href="#">2</a>
+                                    <a href="#">3</a>
+                                    <a href="#">4</a>
+                                </div>
+                                <a href="#" class="next" onclick="handlePagination('next')">Next</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Filter Section -->
+                <div class="filter-section">
+                    <h2>Filter</h2>
+                    <div class="filter-content">
+                        <div class="filter-group">
+                            <label>Entity Type</label>
+                            <input type="text" placeholder="All Types" class="filter-input" data-filter="entityType">
+                        </div>
+                        <div class="filter-group">
+                            <label>Date Range</label>
+                            <input type="text" placeholder="-/-" class="filter-input" data-filter="dateRange">
+                        </div>
+                        <div class="filter-group">
+                            <label>Minimum Mentions</label>
+                            <input type="range" min="0" max="100" class="filter-range" data-filter="mentions">
+                        </div>
+                        <div class="filter-group">
+                            <label>Location</label>
+                            <input type="text" placeholder="Global" class="filter-input" data-filter="location">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Hidden container for charts data
+    <div id="chartsData" data-charts='{{ graphJSON | safe }}' style="display: none;"></div>  -->
+</body>
+</html>
