@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entity Analysis Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}" defer></script>
+</head>
+<body>
+    <div class="layout">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h1>ISD</h1>
+            </div>
+            <nav class="nav-menu">
+                <a href="/" class="nav-item">Entity Analysis</a>
+                <a href="/relationship" class="nav-item active">Entity Relationship</a>
+                <a href="#" class="nav-item">Knowledge Graph</a>
+                <a href="#" class="nav-item">Chatbot</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="search-bar">
+                    <input type="text" placeholder="Search for something" />
+                    <i class="search-icon">🔍</i>
+                </div>
+                <div class="header-icons">
+                    <button class="settings-btn">⚙️</button>
+                    <button class="notifications-btn">🔔</button>
+                    <div class="profile-img">
+                        <img src="{{ url_for('static', filename='images/profile.jpg') }}" alt="Profile">
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="relationship-content">
+                <h2>Entity-Relationship Table</h2>
+                
+                <!-- Stats -->
+                <div class="stats-container">
+                    <div class="stat-box">
+                        <span class="stat-label">Total Relationships</span>
+                        <span class="stat-value">12,750</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Total Entities</span>
+                        <span class="stat-value">1,750</span>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="filter-grid">
+                    <div class="filter-item">
+                        <label>Entity Type 1</label>
+                        <select class="filter-select">
+                            <option>All Types</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label>Relationship Type</label>
+                        <select class="filter-select">
+                            <option>All Relationships</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label>Entity Type 2</label>
+                        <select class="filter-select">
+                            <option>All Types</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label>Minimum Frequency</label>
+                        <input type="number" value="70" class="filter-input">
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="relationship-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Entity 1</th>
+                                <th>Relationship</th>
+                                <th>Entity 2</th>
+                                <th>Frequency</th>
+                                <th>Sentiment</th>
+                                <th>Source</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for relation in relations %}
+                            <tr>
+                                <td>{{ relation.entity1 }}</td>
+                                <td>{{ relation.relationship }}</td>
+                                <td>{{ relation.entity2 }}</td>
+                                <td>{{ relation.frequency }}</td>
+                                <td class="sentiment-{{ relation.sentiment.lower() }}">{{ relation.sentiment }}</td>
+                                <td><a href="#" class="link-btn">Go to link</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination">
+                    <span class="page-info">Showing 1 to 5 of 97 results</span>
+                    <div class="page-controls">
+                        <a href="#" class="page-btn">Previous</a>
+                        <a href="#" class="page-btn active">1</a>
+                        <a href="#" class="page-btn">2</a>
+                        <a href="#" class="page-btn">3</a>
+                        <a href="#" class="page-btn">4</a>
+                        <a href="#" class="page-btn">Next</a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

@@ -12,14 +12,28 @@ function initializeDashboard() {
     try {
         // Get the charts data from the data attribute
         const chartsContainer = document.getElementById('chartsData');
-        const chartData = JSON.parse(chartsContainer.getAttribute('data-charts'));
+        if (!chartsContainer) {
+            throw new Error('Charts data container not found');
+        }
+
+        const chartDataAttr = chartsContainer.getAttribute('data-charts');
+        if (!chartDataAttr) {
+            throw new Error('No chart data found');
+        }
+
+        const chartData = JSON.parse(chartDataAttr);
         
         // Create all charts
         createCharts(chartData);
         
     } catch (error) {
         console.error('Error initializing dashboard:', error);
+        // Display error message to user
+        document.querySelectorAll('.chart').forEach(chart => {
+            chart.innerHTML = '<p class="error">Error loading chart data</p>';
+        });
     }
+    
 }
 
 // Create all charts
@@ -31,82 +45,42 @@ function createCharts(chartData) {
         font: {
             family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
         },
-        margin: { t: 30, r: 20, b: 40, l: 100 }
+        margin: { t: 30, r: 20, b: 40, l: 100 },
+        height: 400
     };
 
     // Create Top Entities chart
-    Plotly.newPlot('topEntities', 
-        JSON.parse(chartData.top_entities),
-        Object.assign({}, layoutDefaults, {
-            height: 400,
-            xaxis: { gridcolor: '#eee' },
-            yaxis: { gridcolor: '#eee' }
-        })
-    );
+    if (chartData.top_entities) {
+        Plotly.newPlot('topEntities', 
+            JSON.parse(chartData.top_entities),
+            Object.assign({}, layoutDefaults, {
+                xaxis: { gridcolor: '#eee' },
+                yaxis: { gridcolor: '#eee' }
+            })
+        );
+    }
 
     // Create Mentions Over Time chart
-    Plotly.newPlot('mentionsTime', 
-        JSON.parse(chartData.mentions_time),
-        Object.assign({}, layoutDefaults, {
-            height: 400,
-            xaxis: { gridcolor: '#eee' },
-            yaxis: { gridcolor: '#eee' }
-        })
-    );
+    if (chartData.mentions_time) {
+        Plotly.newPlot('mentionsTime', 
+            JSON.parse(chartData.mentions_time),
+            Object.assign({}, layoutDefaults, {
+                xaxis: { gridcolor: '#eee' },
+                yaxis: { gridcolor: '#eee' }
+            })
+        );
+    }
 
     // Create Entity Distribution chart
-    Plotly.newPlot('entityDist', 
-        JSON.parse(chartData.entity_dist),
-        Object.assign({}, layoutDefaults, {
-            height: 400
-        })
-    );
-}
-
-// Setup filter event listeners
-function setupFilterListeners() {
-    // Entity Type filter
-    const entityTypeInput = document.querySelector('[data-filter="entityType"]');
-    if (entityTypeInput) {
-        entityTypeInput.addEventListener('change', handleFilterChange);
-    }
-
-    // Date Range filter
-    const dateRangeInput = document.querySelector('[data-filter="dateRange"]');
-    if (dateRangeInput) {
-        dateRangeInput.addEventListener('change', handleFilterChange);
-    }
-
-    // Minimum Mentions filter
-    const mentionsInput = document.querySelector('[data-filter="mentions"]');
-    if (mentionsInput) {
-        mentionsInput.addEventListener('input', handleFilterChange);
-    }
-
-    // Location filter
-    const locationInput = document.querySelector('[data-filter="location"]');
-    if (locationInput) {
-        locationInput.addEventListener('change', handleFilterChange);
+    if (chartData.entity_dist) {
+        Plotly.newPlot('entityDist', 
+            JSON.parse(chartData.entity_dist),
+            Object.assign({}, layoutDefaults)
+        );
     }
 }
 
-// Handle filter changes
-function handleFilterChange(event) {
-    const filterValue = event.target.value;
-    const filterType = event.target.getAttribute('data-filter');
-    
-    console.log(`Filter changed: ${filterType} = ${filterValue}`);
-    // Here you would typically make an AJAX call to your backend to get filtered data
-    // Then update the charts with the new data
-}
-
-// Pagination handlers
-function handlePagination(page) {
-    console.log(`Navigating to page: ${page}`);
-    // Implement pagination logic here
-}
-
-// Window resize handler for responsive charts
+// Handle window resize for responsive charts
 window.addEventListener('resize', function() {
     const charts = document.querySelectorAll('.chart');
     charts.forEach(chart => {

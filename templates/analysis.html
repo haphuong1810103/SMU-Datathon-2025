@@ -16,10 +16,10 @@
                 <img src="{{ url_for('static', filename='images/logo.png') }}" alt="ISD Logo">
             </div>
             <nav class="nav-menu">
-                <a href="#" class="nav-item active">Entity Analysis</a>
-                <a href="#" class="nav-item">Entity Relationship</a>
-                <a href="#" class="nav-item">Knowledge Graph</a>
-                <a href="#" class="nav-item">Chatbot</a>
+                <a href="/" class="nav-item active">Entity Analysis</a>
+                <a href="{{ url_for('relationship') }}" class="nav-item">Entity Relationship</a>
+                <a href="{{ url_for('knowledgeGraph') }}" class="nav-item">Knowledge Graph</a>
+                <a href="{{ url_for('chatbot') }}" class="nav-item">Chatbot</a>
             </nav>
         </aside>
 
@@ -39,11 +39,15 @@
                     <div class="chart-container">
                         <div id="mentionsTime" class="chart"></div>
                     </div>
-
-
+                    
                     <h1>Entity Types Distribution</h1>
                     <div class="chart-container">
                         <div id="entityDist" class="chart"></div>
+                    </div>
+
+                    <h1>Entity Types Distribution</h1>
+                    <div class="chart-container">
+                        
                         <div class="entity-table">
                             <div class="table-header">
                                 <span>Entity</span>
@@ -97,7 +101,7 @@
         </main>
     </div>
 
-    <!-- Hidden container for charts data
-    <div id="chartsData" data-charts='{{ graphJSON | safe }}' style="display: none;"></div>  -->
+    <!-- Hidden container for charts data -->
+    <div id="chartsData" data-charts='{{ graphJSON | safe }}' style="display: none;"></div> 
 </body>
 </html>
