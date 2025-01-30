@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ISD Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</head>
+<body>
+    <div class="layout">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="ISD Logo">
+            </div>
+            <nav class="nav-menu">
+                <a href="/" class="nav-item {% if request.endpoint == 'index' %}active{% endif %}">Entity Analysis</a>
+                <a href="/relationship" class="nav-item {% if request.endpoint == 'relationship' %}active{% endif %}">Entity Relationship</a>
+                <a href="/knowledgeGraph" class="nav-item {% if request.endpoint == 'knowledgeGraph' %}active{% endif %}">Knowledge Graph</a>
+                <a href="/chatbot" class="nav-item {% if request.endpoint == 'chatbot' %}active{% endif %}">Chatbot</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    {% block extra_content %}{% endblock %}
+</body>
+</html>
