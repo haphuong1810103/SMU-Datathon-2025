@@ -43,22 +43,33 @@
         <div class="filter-section">
             <h2>Filter</h2>
             <div class="filter-content">
-                <div class="filter-group">
-                    <label><b>Select Entity Type</b></label>
-                    <div class="checkbox-group">
-                        {% for entity_type in entity_types %}
+                <form id="filterForm" onsubmit="return false;">
+                    <div class="filter-group">
+                        <label><b>Select Entity Type</b></label>
+                        <div class="checkbox-group">
                             <label>
-                                <input type="checkbox" name="entityType" value="{{ entity_type }}" checked>
-                                {{ entity_type }}
+                                <input type="checkbox" name="entityType" value="All Types" checked>
+                                All Types
                             </label>
-                        {% endfor %}
+                            {% for entity_type in entity_types %}
+                                {% if entity_type != 'All Types' %}
+                                    <label>
+                                        <input type="checkbox" name="entityType" value="{{ entity_type }}">
+                                        {{ entity_type }}
+                                    </label>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
                     </div>
-                </div>
-                <div class="filter-group">
-                    <label><b>Select top k entities</b></label>
-                    <input type="range" min="1" max="40" class="filter-range" data-filter="mentions" value="10">
-                    <span id="topKValue">10</span>
-                </div>
+                    <div class="filter-group">
+                        <label><b>Select top k entities</b></label>
+                        <input type="range" min="1" max="40" class="filter-range" data-filter="mentions" value="10">
+                        <span id="topKValue">10</span>
+                    </div>
+                    <div class="filter-group">
+                        <button type="submit" id="filterSubmit" class="filter-submit">Apply Filters</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

@@ -79,40 +79,87 @@ window.addEventListener('resize', function () {
 function setupFilterListeners() {
     const entityTypeCheckboxes = document.querySelectorAll('input[name="entityType"]');
     const topEntitiesInput = document.querySelector('input[data-filter="mentions"]');
+    const filterForm = document.getElementById('filterForm');
 
     if (entityTypeCheckboxes && topEntitiesInput) {
-        entityTypeCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', handleFilterChange);
+        // Add listener for "All Types" checkbox
+        const allTypesCheckbox = document.querySelector('input[value="All Types"]');
+        allTypesCheckbox.addEventListener('change', (e) => {
+            entityTypeCheckboxes.forEach(checkbox => {
+                if (checkbox.value !== 'All Types') {
+                    checkbox.checked = false;
+                    checkbox.disabled = e.target.checked;
+                }
+            });
         });
-        topEntitiesInput.addEventListener('input', handleFilterChange);
+
+        // Add listeners for other checkboxes
+        entityTypeCheckboxes.forEach(checkbox => {
+            if (checkbox.value !== 'All Types') {
+                checkbox.addEventListener('change', (e) => {
+                    const allTypesCheckbox = document.querySelector('input[value="All Types"]');
+                    if (e.target.checked) {
+                        allTypesCheckbox.checked = false;
+                    }
+                });
+            }
+        });
+
+        // Update the displayed value of the range input
+        topEntitiesInput.addEventListener('input', () => {
+            document.getElementById('topKValue').textContent = topEntitiesInput.value;
+        });
+
+        // Add submit button listener
+        filterForm.addEventListener('submit', handleFilterSubmit);
     }
 }
 
+// Handle form submission
+function handleFilterSubmit(event) {
+    event.preventDefault();
+    const submitButton = document.getElementById('filterSubmit');
+    submitButton.disabled = true;
+    submitButton.textContent = 'Updating...';
+
+    handleFilterChange()
+        .then(() => {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Apply Filters';
+        })
+        .catch(error => {
+            console.error('Error updating filters:', error);
+            submitButton.disabled = false;
+            submitButton.textContent = 'Apply Filters';
+        });
+}
+
 // Handle filter change
-function handleFilterChange() {
+async function handleFilterChange() {
     const entityTypeCheckboxes = document.querySelectorAll('input[name="entityType"]:checked');
     const selectedEntityTypes = Array.from(entityTypeCheckboxes).map(checkbox => checkbox.value);
     const topEntities = document.querySelector('input[data-filter="mentions"]').value;
 
-    // Send a POST request to the server with the filter parameters
-    fetch('/filter', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            entityType: selectedEntityTypes,
-            topEntities: topEntities
-        })
-    })
-        .then(response => response.json())
-        .then(data => {
-            // Update the charts with the new data
-            updateCharts(data);
-        })
-        .catch(error => {
-            console.error('Error fetching filtered data:', error);
+    try {
+        // Send a POST request to the server with the filter parameters
+        const response = await fetch('/filter', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                entityType: selectedEntityTypes,
+                topEntities: topEntities
+            })
         });
+
+        const data = await response.json();
+        // Update the charts with the new data
+        updateCharts(data);
+    } catch (error) {
+        console.error('Error fetching filtered data:', error);
+        throw error;
+    }
 }
 
 // Update charts with new data

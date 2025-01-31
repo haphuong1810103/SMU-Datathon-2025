@@ -23,7 +23,7 @@ def analysis():
     df = load_data()
 
     # Get unique entity types for the dropdown
-    entity_types = df['entityType'].unique().tolist()
+    entity_types = ['All Types'] + df['entityType'].unique().tolist()
 
     # Create Top Entities bar chart (default top 10 entities)
     top_entities = df.nlargest(10, 'frequency')
@@ -42,11 +42,22 @@ def analysis():
         height=400
     )
 
-    # Create Entity Types Distribution pie chart
+    # Create Entity Types Distribution pie chart with top 4 and Others
     type_distribution = df['entityType'].value_counts().reset_index()
     type_distribution.columns = ['type', 'count']
+    
+    # Separate top 4 and combine others
+    top_5_types = type_distribution.head(5)
+    others_sum = type_distribution.iloc[5:]['count'].sum()
+    
+    if len(type_distribution) > 5:
+        others_df = pd.DataFrame({'type': ['Others'], 'count': [others_sum]})
+        final_distribution = pd.concat([top_5_types, others_df], ignore_index=True)
+    else:
+        final_distribution = type_distribution
+    
     entity_dist_fig = px.pie(
-        type_distribution,
+        final_distribution,
         values='count',
         names='type',
         title='Entity Types Distribution'
@@ -72,7 +83,7 @@ def filter_data():
     df = load_data()
 
     # Get filter parameters from the request
-    entity_types = request.json.get('entityType')
+    entity_types = request.json.get('entityType', [])
     top_k = int(request.json.get('topEntities'))
 
     # Filter the data based on entity type
@@ -90,7 +101,7 @@ def filter_data():
         x='frequency',
         y='entity',
         orientation='h',
-        title=f'Top {top_k} Entities for {", ".join(entity_types) if entity_types else "All Types"}'
+        title=f'Top {top_k} Entities for {", ".join(entity_types) if entity_types and "All Types" not in entity_types else "All Types"}'
     )
     bar_chart.update_layout(
         showlegend=False,
@@ -100,11 +111,22 @@ def filter_data():
         height=400
     )
 
-    # Create the pie chart for entity type distribution
-    type_distribution = df['entityType'].value_counts().reset_index()
+    # Create the pie chart for entity type distribution with top 4 and Others
+    type_distribution = filtered_df['entityType'].value_counts().reset_index()
     type_distribution.columns = ['type', 'count']
+    
+    # Separate top 4 and combine others
+    top_5_types = type_distribution.head(5)
+    others_sum = type_distribution.iloc[5:]['count'].sum()
+    
+    if len(type_distribution) > 5:
+        others_df = pd.DataFrame({'type': ['Others'], 'count': [others_sum]})
+        final_distribution = pd.concat([top_5_types, others_df], ignore_index=True)
+    else:
+        final_distribution = type_distribution
+    
     pie_chart = px.pie(
-        type_distribution,
+        final_distribution,
         values='count',
         names='type',
         title='Entity Types Distribution'
