@@ -2,12 +2,16 @@ from flask import Flask, render_template
 import plotly.express as px
 import pandas as pd
 import json
-from plotly.utils import PlotlyJSONEncoder  # Correct import for PlotlyJSONEncoder
+from plotly.utils import PlotlyJSONEncoder 
+import os
 
 app = Flask(__name__)
 
 # Sample data
 def get_sample_data():
+    curr = os.getcwd()
+    df = pd.read_csv(f'{curr}/datasets/entity_df.csv')
+    print(df.head())
     # Top entities data
     top_entities = pd.DataFrame({
         'entity': ['Apple', 'Amazon', 'Facebook', 'Energy', 'Airlines', 'Car Brands', 'Technology'],
