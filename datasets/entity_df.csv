@@ -1,4 +1,4 @@
-span,label,frequency
+entity,entityType,frequency
 Singapore,LOC,393
 China,LOC,312
 Russia,LOC,123

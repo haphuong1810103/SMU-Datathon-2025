@@ -11,8 +11,9 @@ app = Flask(__name__)
 def get_sample_data():
     curr = os.getcwd()
     df = pd.read_csv(f'{curr}/datasets/entity_df.csv')
-    print(df.head())
+
     # Top entities data
+    
     top_entities = pd.DataFrame({
         'entity': ['Apple', 'Amazon', 'Facebook', 'Energy', 'Airlines', 'Car Brands', 'Technology'],
         'mentions': [2500, 2300, 2000, 1200, 1000, 800, 500]
