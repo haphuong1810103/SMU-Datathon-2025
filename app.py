@@ -7,16 +7,26 @@ import os
 
 app = Flask(__name__)
 
+
+
+@app.route('/')
+def index():
+    # Data Processing
+    path = os.getcwd()
+    pdf_csv_path = os.path.join(path, 'datasets', 'pdf.csv')
+    url_csv_path = os.path.join(path, 'datasets', 'url.csv')
+
+    pdf_df = pd.read_csv(pdf_csv_path)
+    url_df = pd.read_csv(url_csv_path)
+    
+    # Pass the dataframes directly to the template
+    return render_template('overview.html', pdf_df=pdf_df, url_df=url_df)
+
 # Sample data
 def load_data():
     curr = os.getcwd()
     df = pd.read_csv(f'{curr}/datasets/entity_df.csv')
     return df
-
-@app.route('/')
-def index():
-    return render_template('overview.html')
-
 
 @app.route('/analysis')
 def analysis():

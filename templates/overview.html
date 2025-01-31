@@ -1,11 +1,71 @@
 {% extends "base.html" %}
 
-{% block title %}Knowledge Graph{% endblock %}
+{% block title %}Dataset Overview{% endblock %}
 
 {% block extra_js %}
     <script src="{{ url_for('static', filename='js/dashboard.js') }}" defer></script>
+
+    <!-- Include DataTables JS -->
+    <script type="text/javascript" src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 {% endblock %}
 
 {% block content %}
- 
+    <h1>PDF Data</h1>
+
+    <div class="table-container">
+        <table id="pdf-table" class="table">
+            <thead>
+                <tr>
+                    <th>PDF Path</th>
+                    <th>Text</th>
+                    <th>Entities</th>
+                    <th>Topic</th>
+                    <th>Country</th>
+                    <th>Case Number</th>
+                    <th>Summary</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for index, row in pdf_df.iterrows() %}
+                <tr>
+                    <td>{{ row['PDF Path'] }}</td>
+                    <td>{{ row['Text'] }}</td>
+                    <td>{{ row['entities'] }}</td>
+                    <td>{{ row['topic'] }}</td>
+                    <td>{{ row['country'] }}</td>
+                    <td>{{ row['case_number'] }}</td>
+                    <td>{{ row['Summary'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h1>URL Data</h1>
+    <div class="table-container">
+        <table id="url-table" class="table">
+            <thead>
+                <tr>
+                    <th>Link</th>
+                    <th>Text</th>
+                    <th>Entities</th>
+                    <th>Topic</th>
+                    <th>Country</th>
+                    <th>Summary</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for index, row in url_df.iterrows() %}
+                <tr>
+                    <td><a href="{{ row['Link'] }}" target="_blank">{{ row['Link'] }}</a></td>
+                    <td>{{ row['Text'] }}</td>
+                    <td>{{ row['entities'] }}</td>
+                    <td>{{ row['topic'] }}</td>
+                    <td>{{ row['country'] }}</td>
+                    <td>{{ row['Summary'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}

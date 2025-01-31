@@ -19,6 +19,10 @@ body {
     width: 240px;
     background-color: white;
     padding: 20px 0;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Align items to the start */
 }
 
 .logo {
@@ -27,12 +31,14 @@ body {
 }
 
 .logo img {
-    height: 40px;
+    height: 50px;
 }
 
 .nav-menu {
+    width: 100%; /* Ensure the nav menu takes full width */
     display: flex;
     flex-direction: column;
+    gap: 5px; /* Add gap between nav items */
 }
 
 .nav-item {
@@ -40,6 +46,15 @@ body {
     color: #666;
     text-decoration: none;
     font-size: 14px;
+    width: 100%;
+    display: flex;
+    align-items: center; /* Center items vertically */
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition */
+}
+
+.nav-item:hover {
+    background-color: #f0f0ff; /* Light background on hover */
+    color: #4747ff; /* Change text color on hover */
 }
 
 .nav-item.active {
@@ -47,6 +62,34 @@ body {
     background-color: #f0f0ff;
     border-left: 3px solid #4747ff;
     font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .layout {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        flex-direction: row;
+        align-items: center;
+        padding: 10px 0;
+    }
+
+    .logo {
+        margin-bottom: 0;
+        padding: 0 10px;
+    }
+
+    .nav-menu {
+        flex-direction: row;
+        gap: 5px;
+    }
+
+    .nav-item {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
 }
 
 /* Main Content Styles */
@@ -356,4 +399,40 @@ body {
 
 .attach-btn:hover img, .send-btn:hover img {
     opacity: 1;
+}
+
+/* Table Styles */
+.table-container {
+    max-height: 400px; /* Adjust the height as needed */
+    overflow-y: auto; /* Make the table scrollable vertically */
+    overflow-x: auto; /* Make the table scrollable horizontally */
+    margin-bottom: 20px; /* Add some spacing below the table */
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed; /* Ensure consistent column widths */
+}
+
+.table th,
+.table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    white-space: nowrap; /* Prevent text from wrapping */
+    overflow: hidden; /* Hide overflow */
+    text-overflow: ellipsis; /* Show ellipsis for overflow text */
+    max-width: 200px; /* Set a max width for columns */
+}
+
+.table th {
+    background-color: #f2f2f2;
+    font-weight: 500;
+    color: #333;
+}
+
+/* Add hover effect for better interactivity */
+.table tbody tr:hover {
+    background-color: #f9f9f9;
 }
