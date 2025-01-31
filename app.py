@@ -1,52 +1,35 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify, request
 import plotly.express as px
 import pandas as pd
 import json
-from plotly.utils import PlotlyJSONEncoder 
+from plotly.utils import PlotlyJSONEncoder
 import os
 
 app = Flask(__name__)
 
 # Sample data
-def get_sample_data():
+def load_data():
     curr = os.getcwd()
     df = pd.read_csv(f'{curr}/datasets/entity_df.csv')
+    return df
 
-    # Top entities data
-    
-    top_entities = pd.DataFrame({
-        'entity': ['Apple', 'Amazon', 'Facebook', 'Energy', 'Airlines', 'Car Brands', 'Technology'],
-        'mentions': [2500, 2300, 2000, 1200, 1000, 800, 500]
-    })
-    
-    # Time series data
-    time_data = pd.DataFrame({
-        'year': [2016, 2017, 2018, 2019, 2020, 2021],
-        'mentions': [5000, 22000, 15000, 35000, 20000, 28000]
-    })
-    
-    # Entity types data
-    type_data = pd.DataFrame({
-        'type': ['Organization', 'Person', 'Location', 'Event'],
-        'percentage': [30, 35, 20, 15]
-    })
-    
-    # Entity list data
-    entity_list = pd.DataFrame({
-        'Entity': ['Spotify Subscription', 'Freepik Sales', 'Mobile Service'],
-        'Type': ['Organization', 'Location', 'Organization'],
-        'Mentions': [3000, 2000, 3000]
-    })
-    
-    return top_entities, time_data, type_data, entity_list
 @app.route('/')
 def index():
-    top_entities, time_data, type_data, entity_list = get_sample_data()
-    
-    # Create Top Entities bar chart
+    return render_template('overview.html')
+
+
+@app.route('/analysis')
+def analysis():
+    df = load_data()
+
+    # Get unique entity types for the dropdown
+    entity_types = df['entityType'].unique().tolist()
+
+    # Create Top Entities bar chart (default top 10 entities)
+    top_entities = df.nlargest(10, 'frequency')
     top_entities_fig = px.bar(
         top_entities,
-        x='mentions',
+        x='frequency',
         y='entity',
         orientation='h',
         title='Top Entities'
@@ -58,42 +41,81 @@ def index():
         xaxis_title='',
         height=400
     )
-    
-    # Create Mentions Over Time line chart
-    mentions_time_fig = px.line(
-        time_data,
-        x='year',
-        y='mentions',
-        title='Entity Mentions Over Time',
-        markers=True
+
+    # Create Entity Types Distribution pie chart
+    type_distribution = df['entityType'].value_counts().reset_index()
+    type_distribution.columns = ['type', 'count']
+    entity_dist_fig = px.pie(
+        type_distribution,
+        values='count',
+        names='type',
+        title='Entity Types Distribution'
     )
-    mentions_time_fig.update_layout(
+    entity_dist_fig.update_layout(height=400)
+
+    # Convert the figures to JSON for passing to template
+    graphJSON = json.dumps({
+        'top_entities': top_entities_fig.to_json(),
+        'entity_dist': entity_dist_fig.to_json()
+    })
+
+    # Pass the entity list for the table (top 10 entities by default)
+    entity_list = df.nlargest(10, 'frequency')[['entity', 'entityType', 'frequency']]
+
+    return render_template('analysis.html',
+                         graphJSON=graphJSON,
+                         entity_list=entity_list.to_dict('records'),
+                         entity_types=entity_types)
+
+@app.route('/filter', methods=['POST'])
+def filter_data():
+    df = load_data()
+
+    # Get filter parameters from the request
+    entity_types = request.json.get('entityType')
+    top_k = int(request.json.get('topEntities'))
+
+    # Filter the data based on entity type
+    if entity_types and "All Types" not in entity_types:
+        filtered_df = df[df['entityType'].isin(entity_types)]
+    else:
+        filtered_df = df
+
+    # Get the top k entities based on frequency
+    top_k_entities = filtered_df.nlargest(top_k, 'frequency')
+
+    # Create the bar chart for top k entities
+    bar_chart = px.bar(
+        top_k_entities,
+        x='frequency',
+        y='entity',
+        orientation='h',
+        title=f'Top {top_k} Entities for {", ".join(entity_types) if entity_types else "All Types"}'
+    )
+    bar_chart.update_layout(
+        showlegend=False,
         plot_bgcolor='white',
         yaxis_title='',
         xaxis_title='',
         height=400
     )
-    
-    # Create Entity Types Distribution pie chart
-    entity_dist_fig = px.pie(
-        type_data,
-        values='percentage',
+
+    # Create the pie chart for entity type distribution
+    type_distribution = df['entityType'].value_counts().reset_index()
+    type_distribution.columns = ['type', 'count']
+    pie_chart = px.pie(
+        type_distribution,
+        values='count',
         names='type',
         title='Entity Types Distribution'
     )
-    entity_dist_fig.update_layout(height=400)
-    
-    # Convert the figures to JSON for passing to template
-    graphJSON = json.dumps({
-        'top_entities': top_entities_fig.to_json(),
-        'mentions_time': mentions_time_fig.to_json(),
-        'entity_dist': entity_dist_fig.to_json()
-    })
-    
-    return render_template('analysis.html', 
-                         graphJSON=graphJSON, 
-                         entity_list=entity_list.to_dict('records'))
+    pie_chart.update_layout(height=400)
 
+    # Return the charts as JSON
+    return jsonify({
+        'bar_chart': bar_chart.to_json(),
+        'pie_chart': pie_chart.to_json()
+    })
 
 @app.route('/relationship')
 def relationship():
@@ -113,7 +135,6 @@ def relationship():
             'frequency': 2212,
             'sentiment': 'Positive'
         },
-        # Add more sample data as needed
     ]
     return render_template('relationship.html', relations=relations)
 
@@ -124,3 +145,6 @@ def knowledgeGraph():
 @app.route('/chatbot')
 def chatbot():
     return render_template('chatbot.html')
+
+if __name__ == '__main__':
+    app.run(debug=True)

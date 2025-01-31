@@ -7,7 +7,6 @@
 {% endblock %}
 
 {% block content %}
-    <!-- Content Grid -->
     <div class="content-grid">
         <!-- Main Chart Section -->
         <div class="chart-section">
@@ -16,56 +15,49 @@
                 <div id="topEntities" class="chart"></div>
             </div>
 
-            <h1>Entity Mention Overtime</h1>
-            <div class="chart-container">
-                <div id="mentionsTime" class="chart"></div>
-            </div>
-            
             <h1>Entity Types Distribution</h1>
             <div class="chart-container">
                 <div id="entityDist" class="chart"></div>
             </div>
 
-            <h1>Entity Types Distribution</h1>
+            <h1>Entity List</h1>
             <div class="chart-container">
                 <div class="entity-table">
                     <div class="table-header">
                         <span>Entity</span>
                         <span>Type</span>
-                        <span>Mentions</span>
+                        <span>Frequency</span>
                     </div>
                     {% for entity in entity_list %}
                     <div class="table-row">
-                        <span>{{ entity.Entity }}</span>
-                        <span>{{ entity.Type }}</span>
-                        <span>{{ entity.Mentions }}</span>
+                        <span>{{ entity.entity }}</span>
+                        <span>{{ entity.entityType }}</span>
+                        <span>{{ entity.frequency }}</span>
                     </div>
                     {% endfor %}
-                    <div class="pagination">
-                        <a href="#" class="prev" onclick="handlePagination('prev')">Previous</a>
-                        <div class="pages">
-                            <a href="#" class="active">1</a>
-                            <a href="#">2</a>
-                            <a href="#">3</a>
-                            <a href="#">4</a>
-                        </div>
-                        <a href="#" class="next" onclick="handlePagination('next')">Next</a>
-                    </div>
                 </div>
             </div>
         </div>
-        
+
         <!-- Filter Section -->
         <div class="filter-section">
             <h2>Filter</h2>
             <div class="filter-content">
                 <div class="filter-group">
-                    <label>Entity Type</label>
-                    <input type="text" placeholder="All Types" class="filter-input" data-filter="entityType">
+                    <label><b>Select Entity Type</b></label>
+                    <div class="checkbox-group">
+                        {% for entity_type in entity_types %}
+                            <label>
+                                <input type="checkbox" name="entityType" value="{{ entity_type }}" checked>
+                                {{ entity_type }}
+                            </label>
+                        {% endfor %}
+                    </div>
                 </div>
                 <div class="filter-group">
-                    <label>Select top k entities</label>
-                    <input type="range" min="0" max="40" class="filter-range" data-filter="mentions">
+                    <label><b>Select top k entities</b></label>
+                    <input type="range" min="1" max="40" class="filter-range" data-filter="mentions" value="10">
+                    <span id="topKValue">10</span>
                 </div>
             </div>
         </div>
@@ -73,4 +65,13 @@
 
     <!-- Hidden container for charts data -->
     <div id="chartsData" data-charts='{{ graphJSON | safe }}' style="display: none;"></div>
+
+    <script>
+        // Update the displayed value of the range input
+        const topKInput = document.querySelector('input[data-filter="mentions"]');
+        const topKValue = document.getElementById('topKValue');
+        topKInput.addEventListener('input', () => {
+            topKValue.textContent = topKInput.value;
+        });
+    </script>
 {% endblock %}
