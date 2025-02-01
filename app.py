@@ -78,7 +78,6 @@ def index():
     url_df = url_df.fillna('')
     return render_template('overview.html', pdf_df=pdf_df, url_df=url_df)
 
-# Sample data
 def load_data():
     curr = os.getcwd()
     df = pd.read_csv(f'{curr}/datasets/entity_df.csv')
@@ -164,10 +163,25 @@ def analysis():
     url_wordcloud = generate_wordcloud(url_text, 'URL WordCloud')
 
 
+    # Create Topic Frequency Heatmap
+    topic_path = os.path.join(os.getcwd(), 'datasets', 'topic_counts.csv')
+    topic_df = pd.read_csv(topic_path)
+
+    topic_heatmap_fig = px.scatter(
+        topic_df, 
+        x='Topic', 
+        y='Count', 
+        size='Count', 
+        title='Topic Frequency Bubble Chart'
+    )
+    
+    topic_heatmap_fig.update_layout(height=400)
+
     # Convert the figures to JSON for passing to template
     graphJSON = json.dumps({
         'top_entities': top_entities_fig.to_json(),
-        'entity_dist': entity_dist_fig.to_json()
+        'entity_dist': entity_dist_fig.to_json(),
+        'topic_heatmap': topic_heatmap_fig.to_json()
     })
 
 

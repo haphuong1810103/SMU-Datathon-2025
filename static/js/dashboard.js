@@ -65,6 +65,16 @@ function createCharts(chartData) {
             Object.assign({}, layoutDefaults)
         );
     }
+
+    if (chartData.topic_heatmap) {
+        Plotly.newPlot('topicHeatmap',
+            JSON.parse(chartData.topic_heatmap),
+            Object.assign({}, layoutDefaults, {
+                xaxis: { gridcolor: '#eee' },
+                yaxis: { gridcolor: '#eee' }
+            })
+        );
+    }
 }
 
 // Handle window resize for responsive charts
@@ -190,6 +200,16 @@ function updateCharts(data) {
         Plotly.newPlot('entityDist',
             JSON.parse(data.pie_chart),
             Object.assign({}, layoutDefaults)
+        );
+    }
+
+    if (data.topic_heatmap) {
+        Plotly.newPlot('topicHeatmap',
+            JSON.parse(data.topic_heatmap),
+            Object.assign({}, layoutDefaults, {
+                xaxis: { gridcolor: '#eee' },
+                yaxis: { gridcolor: '#eee' }
+            })
         );
     }
 }
