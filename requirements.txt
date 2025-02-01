@@ -62,3 +62,4 @@ spacy
 networkx
 openpyxl
 matplotlib
+PyPDF2

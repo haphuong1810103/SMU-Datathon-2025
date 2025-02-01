@@ -32,6 +32,7 @@
                 <input type="text" id="chatInput" placeholder="Type a new message here">
                 <button class="attach-btn">
                     <img src="{{ url_for('static', filename='images/attachment.png') }}" alt="Attach">
+                    <input type="file" id="fileInput" style="display: none;">
                 </button>
                 <button class="send-btn">
                     <img src="{{ url_for('static', filename='images/send.png') }}" alt="Send">

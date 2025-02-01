@@ -12,7 +12,8 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import ast
-
+import PyPDF2
+from werkzeug.utils import secure_filename
 
 
 app = Flask(__name__)
@@ -20,6 +21,31 @@ app = Flask(__name__)
 # Configure the Gemini API
 genai.configure(api_key="AIzaSyCSJyVq3QtqDoBeWVffHzZcKVh6lCei8-Q")
 model = genai.GenerativeModel("gemini-1.5-flash")
+
+# Set upload folder and allowed extensions
+UPLOAD_FOLDER = 'static/uploads'
+ALLOWED_EXTENSIONS = {'pdf'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Ensure the upload directory exists
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def extract_text_from_pdf(pdf_path):
+    """Extract text from a PDF file."""
+    try:
+        with open(pdf_path, 'rb') as file:
+            reader = PyPDF2.PdfReader(file)
+            text = ''
+            for page in reader.pages:
+                text += page.extract_text() or ''  # Handle pages with no extractable text
+        return text
+    except Exception as e:
+        return f"Error extracting text: {str(e)}"
+
 
 
 
@@ -254,19 +280,62 @@ def update_graph():
 def chatbot():
     return render_template('chatbot.html')
 
+
+
+def query_ai_model(user_message, extracted_text):
+    """Send user query + extracted text to AI model."""
+    try:
+        if not extracted_text:
+            prompt = f"{user_message}"
+        else:
+            prompt = f"""
+            User Message: {user_message}
+
+            Attached PDF Content (if none, will be empty, then safely ignore):
+            {extracted_text[:1000]}  # Limit text to avoid overloading the model
+
+            Answer concisely based on both inputs.
+            """
+        response = model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        return f"AI Error: {str(e)}"
+    
 @app.route('/ask', methods=['POST'])
 def ask():
-    user_message = request.json.get("message")
-    if not user_message:
-        return jsonify({"error": "No message provided"}), 400
+    """Handle user question + extracted PDF text."""
+    data = request.json
+    user_message = data.get("message", "")
+    extracted_text = data.get("extracted_text", "")
+
+    if not user_message and not extracted_text:
+        return jsonify({"error": "No message or extracted text provided"}), 400
+
+    ai_response = query_ai_model(user_message, extracted_text)
     
-    try:
-        response = model.generate_content(user_message)
-        bot_reply = response.text if hasattr(response, 'text') else "Sorry, I couldn't process that."
-    except Exception as e:
-        bot_reply = f"Error: {str(e)}"
+    return jsonify({"reply": ai_response})
+
+@app.route('/upload', methods=['POST'])
+def upload():
+    """Handle file upload & text extraction."""
+    if 'file' not in request.files:
+        return jsonify({"status": "error", "message": "No file part"}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"status": "error", "message": "No selected file"}), 400
+
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(file_path)
+
+        # Extract text from PDF
+        extracted_text = extract_text_from_pdf(file_path)
+
+        return jsonify({"status": "success", "extracted_text": extracted_text})
     
-    return jsonify({"reply": bot_reply})
+    return jsonify({"status": "error", "message": "Invalid file type"}), 400
 
 if __name__ == '__main__':
     app.run(debug=True)
