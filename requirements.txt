@@ -64,3 +64,4 @@ openpyxl
 matplotlib
 PyPDF2
 wordcloud
+folium
