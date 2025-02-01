@@ -7,26 +7,160 @@
 {% endblock %}
 
 {% block content %}
-    <!-- Header -->
-    <header class="dashboard-header">
-        <div class="search-bar">
-            <input type="text" placeholder="Search for something" />
-            <i class="search-icon">🔍</i>
-        </div>
-        <div class="header-icons">
-            <button class="settings-btn">⚙️</button>
-            <button class="notifications-btn">🔔</button>
-            <div class="profile-img">
-                <img src="{{ url_for('static', filename='images/profile.jpg') }}" alt="Profile">
-            </div>
-        </div>
-    </header>
+    <style>
+        /* Header */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f4f4f4;
+            padding: 10px 20px;
+            border-bottom: 2px solid #ddd;
+        }
 
-    <!-- Content -->
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 5px 10px;
+        }
+
+        .search-bar input {
+            border: none;
+            outline: none;
+            padding: 5px;
+        }
+
+        .header-icons .icon-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            margin: 0 5px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .header-icons .icon-btn:hover {
+            color: #007BFF;
+        }
+
+        /* Stats */
+        .stats-container {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .stat-box {
+            background: #007BFF;
+            color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            flex: 1;
+            text-align: center;
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 14px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* Filters */
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .filter-item label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .filter-select, .filter-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        /* Table */
+        .relationship-table table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .relationship-table th, .relationship-table td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .relationship-table th {
+            background-color: #007BFF;
+            color: #fff;
+        }
+
+        .even-row {
+            background-color: #f9f9f9;
+        }
+
+        /* Sentiment Styles */
+        .sentiment-positive {
+            color: green;
+            font-weight: bold;
+        }
+
+        .sentiment-negative {
+            color: red;
+            font-weight: bold;
+        }
+
+        .sentiment-neutral {
+            color: gray;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .page-controls .page-btn {
+            padding: 8px 12px;
+            margin: 0 3px;
+            border: 1px solid #007BFF;
+            background: #fff;
+            color: #007BFF;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .page-controls .page-btn:hover,
+        .page-controls .page-btn.active {
+            background: #007BFF;
+            color: #fff;
+        }
+    </style>
+
+    <!-- Main Content -->
     <div class="relationship-content">
-        <h2>Entity-Relationship Table</h2>
+        <h2 class="section-title">Entity-Relationship Dashboard</h2>
         
-        <!-- Stats -->
+        <!-- Stats Section -->
         <div class="stats-container">
             <div class="stat-box">
                 <span class="stat-label">Total Relationships</span>
@@ -44,18 +178,26 @@
                 <label>Entity Type 1</label>
                 <select class="filter-select">
                     <option>All Types</option>
+                    <option>ORG</option>
+                    <option>PER</option>
+                    <option>LOC</option>
                 </select>
             </div>
             <div class="filter-item">
                 <label>Relationship Type</label>
                 <select class="filter-select">
                     <option>All Relationships</option>
+                    <option>Partner</option>
+                    <option>Competitor</option>
                 </select>
             </div>
             <div class="filter-item">
                 <label>Entity Type 2</label>
                 <select class="filter-select">
                     <option>All Types</option>
+                    <option>ORG</option>
+                    <option>PER</option>
+                    <option>LOC</option>
                 </select>
             </div>
             <div class="filter-item">
@@ -64,7 +206,7 @@
             </div>
         </div>
 
-        <!-- Table -->
+        <!-- Relationship Table -->
         <div class="relationship-table">
             <table>
                 <thead>
@@ -79,13 +221,13 @@
                 </thead>
                 <tbody>
                     {% for relation in relations %}
-                    <tr>
+                    <tr class="{% if loop.index is even %}even-row{% endif %}">
                         <td>{{ relation.entity1 }}</td>
                         <td>{{ relation.relationship }}</td>
                         <td>{{ relation.entity2 }}</td>
                         <td>{{ relation.frequency }}</td>
-                        <td class="sentiment-{{ relation.sentiment.lower() }}">{{ relation.sentiment }}</td>
-                        <td><a href="#" class="link-btn">Go to link</a></td>
+                        <td class="sentiment-{{ relation.sentiment|lower }}">{{ relation.sentiment }}</td>
+                        <td><a href="#" class="link-btn">View Source</a></td>
                     </tr>
                     {% endfor %}
                 </tbody>
