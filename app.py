@@ -203,26 +203,29 @@ def filter_data():
     })
 
 @app.route('/relationship')
-def relationship():
-    # Sample relationship data
-    relations = [
-        {
-            'entity1': 'Spotify Subscription',
-            'relationship': 'Acquires',
-            'entity2': 'Shopping',
-            'frequency': 1000,
-            'sentiment': 'Negative'
-        },
-        {
-            'entity1': 'Freepik Sales',
-            'relationship': 'Partnered',
-            'entity2': 'Transfer',
-            'frequency': 2212,
-            'sentiment': 'Positive'
-        },
-    ]
-    return render_template('relationship.html', relations=relations)
+def relationship(top_k=100):
+    top_entities = set(entity_counts.nlargest(top_k, 'count')['entity'])
+    entity_type_map = dict(zip(entity_df['entity'], entity_df['entityType']))
+    edges = []
+    
+    for sentence in text_corpus:
+        words = set(sentence.split())
+        sentence_entities = words.intersection(top_entities)
+        edges.extend(combinations(sentence_entities, 2))
+    
+    edge_counts = Counter(edges)
+    relations = []
+    for (entity1, entity2), frequency in edge_counts.items():
+        relations.append({
+            'entity1': entity1,
+            'entity1_type': entity_type_map.get(entity1, 'Unknown'),  # Get entity type or 'Unknown' if not found
+            'relationship': 'Related To',  # Placeholder relationship
+            'entity2': entity2,
+            'entity2_type': entity_type_map.get(entity2, 'Unknown'),  # Get entity type or 'Unknown' if not found
+            'frequency': frequency
+        })
 
+    return render_template('relationship.html', relations=relations)
 
 curr = os.getcwd()
 entity_df = pd.read_csv(f'{curr}/datasets/entity_df.csv')

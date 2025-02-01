@@ -212,22 +212,22 @@
                 <thead>
                     <tr>
                         <th>Entity 1</th>
+                        <th>Type 1</th>
                         <th>Relationship</th>
                         <th>Entity 2</th>
+                        <th>Type 2</th>
                         <th>Frequency</th>
-                        <th>Sentiment</th>
-                        <th>Source</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for relation in relations %}
                     <tr class="{% if loop.index is even %}even-row{% endif %}">
                         <td>{{ relation.entity1 }}</td>
-                        <td>{{ relation.relationship }}</td>
+                        <td>{{ relation.entity1_type }}</td>
+                        <td><a href="{{ url_for('chatbot') }}" class="link-btn">{{ relation.relationship }}</a></td>
                         <td>{{ relation.entity2 }}</td>
+                        <td>{{ relation.entity2_type }}</td>
                         <td>{{ relation.frequency }}</td>
-                        <td class="sentiment-{{ relation.sentiment|lower }}">{{ relation.sentiment }}</td>
-                        <td><a href="#" class="link-btn">View Source</a></td>
                     </tr>
                     {% endfor %}
                 </tbody>
