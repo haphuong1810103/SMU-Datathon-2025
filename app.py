@@ -5,6 +5,13 @@ import json
 from plotly.utils import PlotlyJSONEncoder
 import os
 import google.generativeai as genai
+import networkx as nx
+from collections import Counter
+from itertools import combinations
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
 
 
 app = Flask(__name__)
@@ -177,9 +184,58 @@ def relationship():
     ]
     return render_template('relationship.html', relations=relations)
 
+
+curr = os.getcwd()
+entity_df = pd.read_csv(f'{curr}/datasets/entity_df.csv')
+entity_counts = entity_df.groupby(['entity', 'entityType'])['frequency'].sum().reset_index(name='count')
+news_data = pd.read_excel(f'{curr}/datasets/input/news_excerpts_parsed.xlsx')['Text'].dropna().tolist()
+wikileaks_data = pd.read_excel(f'{curr}/datasets/input/wikileaks_parsed.xlsx')['Text'].dropna().tolist()
+text_corpus = news_data + wikileaks_data  
+text_corpus = text_corpus[:2000]  # Limit to 1000 sentences for performance
+def plot_network(top_k=10):
+    top_entities = set(entity_counts.nlargest(top_k, 'count')['entity'])
+    entity_type_map = dict(zip(entity_df['entity'], entity_df['entityType']))
+    edges = []
+    for sentence in text_corpus:
+        words = set(sentence.split())
+        sentence_entities = words.intersection(top_entities)
+        edges.extend(combinations(sentence_entities, 2))
+    edge_counts = Counter(edges)
+    G = nx.Graph()
+    for edge, weight in edge_counts.items():
+        G.add_edge(edge[0], edge[1], weight=weight)
+    entity_types = list(set(entity_type_map.values()))  # Unique entity types
+    color_map = {etype: plt.cm.tab10(i % 10) for i, etype in enumerate(entity_types)}  # Color mapping
+    node_colors = [color_map.get(entity_type_map.get(node, ''), 'gray') for node in G.nodes()]
+    plt.figure(figsize=(10, 10))
+    pos = nx.spring_layout(G, seed=42)
+    nx.draw_networkx_nodes(G, pos, node_size=500, node_color=node_colors)
+    nx.draw_networkx_edges(G, pos, width=1.0, alpha=0.5)
+    nx.draw_networkx_labels(G, pos, font_size=10)
+
+    # Add legend
+    for etype, color in color_map.items():
+        plt.scatter([], [], c=[color], label=etype)
+    plt.legend(title="Entity Types")
+
+    plt.title("Entity Relationship Network")
+    graph_path = os.path.join("static", "images", "entity_network.png")
+    plt.savefig(graph_path)
+    plt.close()
+
+    return graph_path
+
 @app.route('/knowledgeGraph')
 def knowledgeGraph():
-    return render_template('knowledgeGraph.html')
+    graph_path = plot_network(10)
+    return render_template('knowledgeGraph.html', graph_path='/static/images/entity_network.png')
+
+@app.route('/updateGraph', methods=['POST'])
+def update_graph():
+    top_k = request.json.get('top_k', 10)
+    graph_path = plot_network(top_k)
+    return {"graph_path": "/static/images/entity_network.png"}
+
 
 @app.route('/chatbot')
 def chatbot():

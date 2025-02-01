@@ -2,10 +2,107 @@
 
 {% block title %}Knowledge Graph{% endblock %}
 
+{% block extra_css %}
+<style>
+    body {
+        background-color: #f5f7fa;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+    }
+    .container {
+        max-width: 800px;
+        margin: 30px auto;
+        padding: 20px;
+        background-color: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        text-align: center;
+    }
+    h2 {
+        color: #2c3e50;
+        margin-bottom: 20px;
+    }
+    label {
+        font-weight: bold;
+        margin-right: 10px;
+    }
+    input[type="number"] {
+        width: 70px;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        text-align: center;
+    }
+    button {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        margin-left: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    button:hover {
+        background-color: #2980b9;
+    }
+    .graph-container {
+        margin-top: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 10px;
+        background-color: #fafafa;
+        transition: transform 0.3s;
+    }
+    .graph-container:hover {
+        transform: scale(1.02);
+    }
+    #entityGraph {
+        width: 100%;
+        height: auto;
+        border-radius: 5px;
+    }
+    @media (max-width: 600px) {
+        .container {
+            padding: 15px;
+        }
+        input[type="number"], button {
+            width: 100%;
+            margin: 5px 0;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block extra_js %}
-    <script src="{{ url_for('static', filename='js/dashboard.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}" defer></script>
 {% endblock %}
 
 {% block content %}
- 
+<div class="container">
+    <h2>📊 Entity Relationship Network</h2>
+    <label for="topK">Select Top Entities:</label>
+    <input type="number" id="topK" value="10" min="1" max="50">
+    <button onclick="updateGraph()">Generate Graph</button>
+
+    <div class="graph-container">
+        <img id="entityGraph" src="{{ graph_path }}" alt="Entity Network Graph">
+    </div>
+</div>
+
+<script>
+    function updateGraph() {
+        const topK = document.getElementById("topK").value;
+        fetch("/updateGraph", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ top_k: parseInt(topK) })
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("entityGraph").src = data.graph_path + "?t=" + new Date().getTime();
+        })
+        .catch(error => console.error("Error updating graph:", error));
+    }
+</script>
 {% endblock %}
