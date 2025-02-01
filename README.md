@@ -18,13 +18,13 @@ This project was developed as part of the **SMU Datathon 2025**, showcasing adva
 Our system is built using a modular architecture:  
 
 ### Frontend Layer (User Interface)  
-- **Web App**: Built with **Streamlit/React** for interactive exploration.  
+- **Flask Templates (Jinja2, HTML, CSS, JS)**: Provides the web interface for user interactions. 
 - **Visualization Engine**: Uses **Plotly, D3.js** for entity graphs and charts.  
 
 ### Backend Layer (Processing & APIs)  
 - **Flask API**: Handles entity extraction and data retrieval.  
 - **Google Gemini API**: Provides conversational AI and document insights.  
-- **Database APIs**: Enables querying and filtering of entity relationships.  
+
 
 ### Data Processing Layer (NLP & Relationship Mapping)  
 - **SpaCy NLP Pipeline**: Performs entity extraction.  
@@ -39,7 +39,7 @@ Our system is built using a modular architecture:
 ## Workflow Summary  
 
 1. **User uploads a text or document** → The system extracts entities and relationships.  
-2. **Data is processed and stored** → Sentiment and relationship strength are analyzed.  
+2. **Data is processed and stored** → Relationship strength are analyzed.  
 3. **User explores insights** via interactive dashboards and knowledge graphs.  
 4. **Chatbot allows real-time Q&A** → Answers are contextually generated using AI.  
 
