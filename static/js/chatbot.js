@@ -12,11 +12,21 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Clear input
             chatInput.value = '';
-            
-            // Simulate bot response
-            setTimeout(() => {
-                simulateBotResponse(message);
-            }, 1000);
+
+            // Fetch response from backend
+            fetch('/ask', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                addMessage(data.reply, 'bot');
+            })
+            .catch(error => {
+                addMessage("Error: Could not get response from AI.", 'bot');
+                console.error("Fetch error:", error);
+            });
         }
     }
 
@@ -26,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
         messageDiv.className = `message ${type}-message`;
         
         let messageHTML = '';
-        
+
         if (type === 'bot') {
             messageHTML = `
                 <div class="bot-avatar">
@@ -49,19 +59,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Scroll to bottom
         chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    // Simulate bot response
-    function simulateBotResponse(userMessage) {
-        const responses = [
-            "I understand you're asking about " + userMessage + ". Let me help you with that.",
-            "That's an interesting question about " + userMessage + ". Here's what I know.",
-            "I'd be happy to help you understand more about " + userMessage + ".",
-            "Let me analyze " + userMessage + " for you."
-        ];
-        
-        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-        addMessage(randomResponse, 'bot');
     }
 
     // Event listeners

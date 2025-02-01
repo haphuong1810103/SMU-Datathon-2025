@@ -4,8 +4,15 @@ import pandas as pd
 import json
 from plotly.utils import PlotlyJSONEncoder
 import os
+import google.generativeai as genai
+
 
 app = Flask(__name__)
+
+# Configure the Gemini API
+genai.configure(api_key="AIzaSyCSJyVq3QtqDoBeWVffHzZcKVh6lCei8-Q")
+model = genai.GenerativeModel("gemini-1.5-flash")
+
 
 
 
@@ -177,6 +184,20 @@ def knowledgeGraph():
 @app.route('/chatbot')
 def chatbot():
     return render_template('chatbot.html')
+
+@app.route('/ask', methods=['POST'])
+def ask():
+    user_message = request.json.get("message")
+    if not user_message:
+        return jsonify({"error": "No message provided"}), 400
+    
+    try:
+        response = model.generate_content(user_message)
+        bot_reply = response.text if hasattr(response, 'text') else "Sorry, I couldn't process that."
+    except Exception as e:
+        bot_reply = f"Error: {str(e)}"
+    
+    return jsonify({"reply": bot_reply})
 
 if __name__ == '__main__':
     app.run(debug=True)
