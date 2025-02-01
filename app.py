@@ -240,6 +240,16 @@ def filter_data():
 
 @app.route('/relationship')
 def relationship(top_k=100):
+    # Extract query parameters
+    min_frequency = int(request.args.get('min_frequency', 1))
+    entity_type_1 = request.args.get('entity_type_1', 'All Types')
+    entity_type_2 = request.args.get('entity_type_2', 'All Types')
+    
+    # Get unique entity types dynamically from your data
+    unique_entity_types = entity_df['entityType'].unique().tolist()
+    unique_entity_types.insert(0, 'All Types')  # Add 'All Types' as the first option
+
+    # Filter entities
     top_entities = set(entity_counts.nlargest(top_k, 'count')['entity'])
     entity_type_map = dict(zip(entity_df['entity'], entity_df['entityType']))
     edges = []
@@ -250,18 +260,44 @@ def relationship(top_k=100):
         edges.extend(combinations(sentence_entities, 2))
     
     edge_counts = Counter(edges)
+    
+    # Calculate total relationships and total entities
+    total_relationships = len(edge_counts)  # Total unique relationships (edges)
+    total_entities = len(set([e[0] for e in edge_counts]) | set([e[1] for e in edge_counts]))  # Unique entities involved in relationships
+    
     relations = []
+    
     for (entity1, entity2), frequency in edge_counts.items():
+        # Filter by minimum frequency
+        if frequency < min_frequency:
+            continue
+        
+        # Filter by entity types
+        entity1_type = entity_type_map.get(entity1, 'Unknown')
+        entity2_type = entity_type_map.get(entity2, 'Unknown')
+        
+        if (entity_type_1 != 'All Types' and entity1_type != entity_type_1) or \
+           (entity_type_2 != 'All Types' and entity2_type != entity_type_2):
+            continue
+        
         relations.append({
             'entity1': entity1,
-            'entity1_type': entity_type_map.get(entity1, 'Unknown'),  # Get entity type or 'Unknown' if not found
-            'relationship': 'Related To',  # Placeholder relationship
+            'entity1_type': entity1_type,
+            'relationship': 'Related To',
             'entity2': entity2,
-            'entity2_type': entity_type_map.get(entity2, 'Unknown'),  # Get entity type or 'Unknown' if not found
+            'entity2_type': entity2_type,
             'frequency': frequency
         })
 
-    return render_template('relationship.html', relations=relations)
+    return render_template('relationship.html', 
+                           relations=relations, 
+                           min_frequency=min_frequency,
+                           entity_type_1=entity_type_1,
+                           entity_type_2=entity_type_2,
+                           unique_entity_types=unique_entity_types,
+                           total_relationships=total_relationships,
+                           total_entities=total_entities)
+
 
 curr = os.getcwd()
 entity_df = pd.read_csv(f'{curr}/datasets/entity_df.csv')

@@ -183,7 +183,7 @@
                 {% for index, row in url_df.iterrows() %}
                 <tr>
                     <td><a href="{{ row['Link'] }}" target="_blank">{{ row['Link'] if row['Link'] != 'NaN' else '' }}</a></td>
-                    <!--<td class="text-column">{{ row['Text'] if row['Text'] != 'NaN' else '' }}</td>-->
+                    <td class="text-column">{{ row['Text'] if row['Text'] != 'NaN' else '' }}</td>
                     <td>{{ row['entities'] if row['entities'] != 'NaN' else '' }}</td>
                     <td>{{ row['topic'] if row['topic'] != 'NaN' else '' }}</td>
                     <td>{{ row['country'] if row['country'] != 'NaN' else '' }}</td>
