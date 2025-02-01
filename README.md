@@ -46,7 +46,7 @@ Our system is built using a modular architecture:
 ## Live Demo & Video Demonstration  
 
 - **Live Demo**: [Click here](https://smu-datathon.onrender.com/)  
-- **Video Demonstration**: [Link to video]  
+- **Video Demonstration**: [https://youtu.be/s-kYu3vvxlI]  
 
 ## Contributing  
 
