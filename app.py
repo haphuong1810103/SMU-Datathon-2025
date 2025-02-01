@@ -187,15 +187,13 @@ def filter_data():
         final_distribution = pd.concat([top_5_types, others_df], ignore_index=True)
     else:
         final_distribution = type_distribution
-    
     pie_chart = px.pie(
         final_distribution,
-        values='count',
-        names='type',
+        values=final_distribution['count'],
+        names=final_distribution['type'],
         title='Entity Types Distribution'
     )
-    pie_chart.update_layout(height=400)
-
+    
     # Return the charts as JSON
     return jsonify({
         'bar_chart': bar_chart.to_json(),
