@@ -29,6 +29,11 @@
             <div class="chart-container">
                 <img src="data:image/png;base64,{{ url_wordcloud }}" alt="URL WordCloud">
             </div>
+
+            <h1>Entity Location Map</h1>
+            <div class="chart-container">
+                <iframe src="{{ url_for('static', filename='images/entities_map.html') }}" width="100%" height="500px" style="border:none;"></iframe>
+            </div>
         </div>
 
         <!-- Filter Section -->
