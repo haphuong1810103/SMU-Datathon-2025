@@ -10,6 +10,130 @@
 {% endblock %}
 
 {% block content %}
+    <style>
+        /* General styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .table-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+            overflow-y: auto; /* Enable scrolling */
+            display: block;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+
+        th, td {
+            padding: 15px 20px;
+            height: 100px; /* Adjust as needed */
+            text-align: left;
+            min-height: 80px; /* Increase row height */
+            vertical-align: top; /* Ensure text starts at the top */
+            word-wrap: break-word;
+        }
+
+        /* Reduce the width of the first column */
+        td.pdf-path-column {
+            max-width: 100px;
+            min-width: 100px;
+            word-wrap: break-word;
+            white-space: normal;
+        }
+
+        /* Allow multi-line text */
+        td.text-column, td.summary-column {
+            white-space: normal; /* Allow text to wrap */
+            word-wrap: break-word; /* Break long words */
+            max-height: 150px; /* Allow expansion */
+        }
+
+        th {
+            background-color: #007BFF;
+            color: white;
+            font-weight: bold;
+        }
+
+        td {
+            background-color: #f9f9f9;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:nth-child(even) td {
+            background-color: #f1f1f1;
+        }
+
+        tr:hover td {
+            background-color: #eef4ff;
+        }
+
+        a {
+            color: #007BFF;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a:hover {
+            color: #0056b3;
+        }
+
+        /* Column adjustments */
+        td.text-column, td.summary-column {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: normal; /* Prevent text from wrapping */
+            max-height: 50px; /* Limit the row height */
+        }
+
+        td.pdf-path-column {
+            max-width: 150px; /* Limit PDF path column length */
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        /* Handling NaN values */
+        td.nan-replace {
+            text-align: center;
+            color: #888;
+        }
+
+        /* Responsive table */
+        @media (max-width: 768px) {
+            .table-container {
+                padding: 15px;
+            }
+
+            .table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+        }
+    </style>
+
+    <!-- PDF Data -->
     <h1>PDF Data</h1>
 
     <div class="table-container">
@@ -17,7 +141,7 @@
             <thead>
                 <tr>
                     <th>PDF Path</th>
-                    <th>Text</th>
+                    <!--<th>Text</th>-->
                     <th>Entities</th>
                     <th>Topic</th>
                     <th>Country</th>
@@ -28,26 +152,27 @@
             <tbody>
                 {% for index, row in pdf_df.iterrows() %}
                 <tr>
-                    <td>{{ row['PDF Path'] }}</td>
-                    <td>{{ row['Text'] }}</td>
-                    <td>{{ row['entities'] }}</td>
-                    <td>{{ row['topic'] }}</td>
-                    <td>{{ row['country'] }}</td>
-                    <td>{{ row['case_number'] }}</td>
-                    <td>{{ row['Summary'] }}</td>
+                    <td class="pdf-path-column">{{ row['PDF Path'] if row['PDF Path'] != 'NaN' else '' }}</td>
+                    <!-- <td class="text-column">{{ row['Text'] if row['Text'] != 'NaN' else '' }}</td> -->
+                    <td>{{ row['entities'] if row['entities'] != 'NaN' else '' }}</td>
+                    <td>{{ row['topic'] if row['topic'] != 'NaN' else '' }}</td>
+                    <td>{{ row['country'] if row['country'] != 'NaN' else '' }}</td>
+                    <td>{{ row['case_number'] if row['case_number'] != 'NaN' else '' }}</td>
+                    <td class="summary-column">{{ row['Summary'] if row['Summary'] != 'NaN' else '' }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 
+    <!-- URL Data -->
     <h1>URL Data</h1>
     <div class="table-container">
         <table id="url-table" class="table">
             <thead>
                 <tr>
                     <th>Link</th>
-                    <th>Text</th>
+                    <!--<th>Text</th>-->
                     <th>Entities</th>
                     <th>Topic</th>
                     <th>Country</th>
@@ -57,12 +182,12 @@
             <tbody>
                 {% for index, row in url_df.iterrows() %}
                 <tr>
-                    <td><a href="{{ row['Link'] }}" target="_blank">{{ row['Link'] }}</a></td>
-                    <td>{{ row['Text'] }}</td>
-                    <td>{{ row['entities'] }}</td>
-                    <td>{{ row['topic'] }}</td>
-                    <td>{{ row['country'] }}</td>
-                    <td>{{ row['Summary'] }}</td>
+                    <td><a href="{{ row['Link'] }}" target="_blank">{{ row['Link'] if row['Link'] != 'NaN' else '' }}</a></td>
+                    <!--<td class="text-column">{{ row['Text'] if row['Text'] != 'NaN' else '' }}</td>-->
+                    <td>{{ row['entities'] if row['entities'] != 'NaN' else '' }}</td>
+                    <td>{{ row['topic'] if row['topic'] != 'NaN' else '' }}</td>
+                    <td>{{ row['country'] if row['country'] != 'NaN' else '' }}</td>
+                    <td class="summary-column">{{ row['Summary'] if row['Summary'] != 'NaN' else '' }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

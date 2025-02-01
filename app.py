@@ -11,6 +11,7 @@ from itertools import combinations
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+import ast
 
 
 
@@ -32,8 +33,20 @@ def index():
 
     pdf_df = pd.read_csv(pdf_csv_path)
     url_df = pd.read_csv(url_csv_path)
+
+    def process_entities(entities_column):
+        entities_list = ast.literal_eval(entities_column)
+        formatted_entities = [f"{entity['span']} ({entity['label']})" for entity in entities_list]
+        return ', '.join(formatted_entities)
+
+    # Apply the function to the 'entities' column for both DataFrames
+    pdf_df['entities'] = pdf_df['entities'].apply(process_entities)
+    url_df['entities'] = url_df['entities'].apply(process_entities)
+
     
     # Pass the dataframes directly to the template
+    pdf_df = pdf_df.fillna('')  # Replace NaN with an empty string
+    url_df = url_df.fillna('')
     return render_template('overview.html', pdf_df=pdf_df, url_df=url_df)
 
 # Sample data
