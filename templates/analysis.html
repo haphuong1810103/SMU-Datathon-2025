@@ -10,7 +10,7 @@
     <div class="content-grid">
         <!-- Main Chart Section -->
         <div class="chart-section">
-            <h1>Top Entities</h1>
+            <h1>Top Entities Mentions</h1>
             <div class="chart-container">
                 <div id="topEntities" class="chart"></div>
             </div>
@@ -20,22 +20,14 @@
                 <div id="entityDist" class="chart"></div>
             </div>
 
-            <h1>Entity List</h1>
+            <h1>PDF WordCloud</h1>
             <div class="chart-container">
-                <div class="entity-table">
-                    <div class="table-header">
-                        <span>Entity</span>
-                        <span>Type</span>
-                        <span>Frequency</span>
-                    </div>
-                    {% for entity in entity_list %}
-                    <div class="table-row">
-                        <span>{{ entity.entity }}</span>
-                        <span>{{ entity.entityType }}</span>
-                        <span>{{ entity.frequency }}</span>
-                    </div>
-                    {% endfor %}
-                </div>
+                <img src="data:image/png;base64,{{ pdf_wordcloud }}" alt="PDF WordCloud">
+            </div>
+
+            <h1>URL WordCloud</h1>
+            <div class="chart-container">
+                <img src="data:image/png;base64,{{ url_wordcloud }}" alt="URL WordCloud">
             </div>
         </div>
 
@@ -63,7 +55,7 @@
                     </div>
                     <div class="filter-group">
                         <label><b>Select top k entities</b></label>
-                        <input type="range" min="1" max="40" class="filter-range" data-filter="mentions" value="10">
+                        <input type="range" min="1" max="15" class="filter-range" data-filter="mentions" value="10">
                         <span id="topKValue">10</span>
                     </div>
                     <div class="filter-group">

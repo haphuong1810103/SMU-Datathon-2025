@@ -63,3 +63,4 @@ networkx
 openpyxl
 matplotlib
 PyPDF2
+wordcloud

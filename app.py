@@ -14,6 +14,9 @@ import matplotlib.pyplot as plt
 import ast
 import PyPDF2
 from werkzeug.utils import secure_filename
+from wordcloud import WordCloud
+import io
+import base64
 
 
 app = Flask(__name__)
@@ -81,6 +84,27 @@ def load_data():
     df = pd.read_csv(f'{curr}/datasets/entity_df.csv')
     return df
 
+def generate_wordcloud(text, title):
+    # Generate the WordCloud
+    wordcloud = WordCloud(width=800, height=400, background_color='white').generate(text)
+
+    # Plot the WordCloud
+    plt.figure(figsize=(10, 5))
+    plt.imshow(wordcloud, interpolation='bilinear')
+    plt.axis('off')
+    plt.title(title, fontsize=20)
+
+    # Save the WordCloud to a BytesIO object
+    img_bytes = io.BytesIO()
+    plt.savefig(img_bytes, format='png', bbox_inches='tight', pad_inches=0)
+    img_bytes.seek(0)
+
+    # Convert the image to a base64 string
+    img_base64 = base64.b64encode(img_bytes.getvalue()).decode('utf-8')
+    plt.close()
+
+    return img_base64
+
 @app.route('/analysis')
 def analysis():
     df = load_data()
@@ -127,19 +151,31 @@ def analysis():
     )
     entity_dist_fig.update_layout(height=400)
 
+    # Generate WordCloud for PDF text
+    pdf_path = os.path.join(os.getcwd(), 'datasets', 'pdf.csv')
+    pdf_df = pd.read_csv(pdf_path)
+    pdf_text = ' '.join(pdf_df['Text'].dropna())
+    pdf_wordcloud = generate_wordcloud(pdf_text, 'PDF WordCloud')
+
+    # Generate WordCloud for URL text
+    url_path = os.path.join(os.getcwd(), 'datasets', 'url.csv')
+    url_df = pd.read_csv(url_path)
+    url_text = ' '.join(url_df['Text'].dropna())
+    url_wordcloud = generate_wordcloud(url_text, 'URL WordCloud')
+
+
     # Convert the figures to JSON for passing to template
     graphJSON = json.dumps({
         'top_entities': top_entities_fig.to_json(),
         'entity_dist': entity_dist_fig.to_json()
     })
 
-    # Pass the entity list for the table (top 10 entities by default)
-    entity_list = df.nlargest(10, 'frequency')[['entity', 'entityType', 'frequency']]
 
     return render_template('analysis.html',
                          graphJSON=graphJSON,
-                         entity_list=entity_list.to_dict('records'),
-                         entity_types=entity_types)
+                         entity_types=entity_types,
+                         pdf_wordcloud=pdf_wordcloud,
+                         url_wordcloud=url_wordcloud)
 
 @app.route('/filter', methods=['POST'])
 def filter_data():
@@ -187,13 +223,15 @@ def filter_data():
         final_distribution = pd.concat([top_5_types, others_df], ignore_index=True)
     else:
         final_distribution = type_distribution
+    
     pie_chart = px.pie(
         final_distribution,
-        values=final_distribution['count'],
-        names=final_distribution['type'],
+        values='count',
+        names='type',
         title='Entity Types Distribution'
     )
-    
+    pie_chart.update_layout(height=400)
+
     # Return the charts as JSON
     return jsonify({
         'bar_chart': bar_chart.to_json(),
