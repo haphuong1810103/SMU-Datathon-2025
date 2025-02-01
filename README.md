@@ -48,10 +48,3 @@ Our system is built using a modular architecture:
 - **Live Demo**: [Click here](https://smu-datathon.onrender.com/)  
 - **Video Demonstration**: [https://youtu.be/s-kYu3vvxlI]  
 
-## Contributing  
-
-We welcome contributions! Feel free to open issues or submit pull requests.  
-
-## License  
-
-This project is licensed under the MIT License - see the LICENSE file for details.  
